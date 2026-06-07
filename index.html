@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ASAT PAI Kelas 2 SD</title>
+
+<style>
+:root{
+--bg:#FFFDF6;
+--text:#2C3E50;
+--primary:#1ABC9C;
+}
+
+*{
+box-sizing:border-box;
+font-family:'Segoe UI',sans-serif;
+}
+
+body{
+background:var(--bg);
+margin:0;
+padding:20px;
+display:flex;
+justify-content:center;
+align-items:center;
+min-height:100vh;
+}
+
+.container{
+background:white;
+width:100%;
+max-width:700px;
+padding:30px;
+border-radius:25px;
+box-shadow:0 10px 25px rgba(0,0,0,.08);
+}
+
+.header{
+text-align:center;
+margin-bottom:20px;
+}
+
+.header h1{
+color:var(--primary);
+margin:0;
+}
+
+.progress{
+height:12px;
+background:#eee;
+border-radius:20px;
+overflow:hidden;
+margin-bottom:20px;
+}
+
+.fill{
+height:100%;
+width:0%;
+background:var(--primary);
+transition:.4s;
+}
+
+.meta{
+display:flex;
+justify-content:space-between;
+margin-bottom:15px;
+font-weight:bold;
+}
+
+.badge{
+padding:8px 15px;
+border-radius:15px;
+}
+
+.question{
+font-size:20px;
+font-weight:bold;
+margin-bottom:20px;
+line-height:1.5;
+}
+
+.option{
+width:100%;
+padding:15px;
+margin:8px 0;
+border:none;
+border-radius:15px;
+cursor:pointer;
+background:#f7f7f7;
+font-size:16px;
+font-weight:600;
+text-align:left;
+}
+
+.option:hover{
+background:#eaeaea;
+}
+
+.result{
+display:none;
+text-align:center;
+}
+
+.score{
+font-size:60px;
+font-weight:bold;
+color:var(--primary);
+}
+
+.restart{
+background:var(--primary);
+color:white;
+border:none;
+padding:12px 25px;
+border-radius:15px;
+cursor:pointer;
+font-size:16px;
+font-weight:bold;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div id="quiz">
+
+<div class="header">
+<h1>🕌 Ujian Asyik PAI</h1>
+<p>ASAT Kelas 2 SD</p>
+</div>
+
+<div class="progress">
+<div id="fill" class="fill"></div>
+</div>
+
+<div class="meta">
+<span id="nomor"></span>
+<span id="bab" class="badge"></span>
+</div>
+
+<div id="soal" class="question"></div>
+
+<div id="pilihan"></div>
+
+</div>
+
+<div id="hasil" class="result">
+
+<h2>🎉 Alhamdulillah Selesai!</h2>
+
+<div id="nilai" class="score">0</div>
+
+<p id="pesan"></p>
+
+<button class="restart" onclick="ulangKuis()">
+Ulangi Kuis
+</button>
+
+</div>
+
+</div>
+
+<script>
+
+const quizData = [
+
+{bab:"BAB 6",warna:"#D3F2E4",q:"Arti kata Al-Falaq adalah ....",opsi:["Pembukaan","Waktu Subuh","Manusia"],jawab:1},
+{bab:"BAB 6",warna:"#D3F2E4",q:"Surah Al-Falaq terdiri atas .... ayat.",opsi:["3 ayat","4 ayat","5 ayat"],jawab:2},
+{bab:"BAB 6",warna:"#D3F2E4",q:"Surah Al-Falaq diturunkan di kota ....",opsi:["Mekkah","Madinah","Mesir"],jawab:0},
+{bab:"BAB 6",warna:"#D3F2E4",q:"Kita memohon perlindungan hanya kepada ....",opsi:["Malaikat","Allah SWT","Manusia"],jawab:1},
+{bab:"BAB 6",warna:"#D3F2E4",q:"Salah satu kejahatan yang disebut dalam Surah Al-Falaq adalah ....",opsi:["Kegelapan malam","Hujan deras","Panas matahari"],jawab:0},
+
+{bab:"BAB 7",warna:"#D6EAF8",q:"Iman kepada malaikat merupakan rukun iman ke ....",opsi:["1","2","3"],jawab:1},
+{bab:"BAB 7",warna:"#D6EAF8",q:"Malaikat diciptakan dari ....",opsi:["Api","Cahaya","Tanah"],jawab:1},
+{bab:"BAB 7",warna:"#D6EAF8",q:"Jumlah malaikat yang wajib diketahui ada ....",opsi:["5","10","25"],jawab:1},
+{bab:"BAB 7",warna:"#D6EAF8",q:"Malaikat yang menyampaikan wahyu adalah ....",opsi:["Jibril","Mikail","Israfil"],jawab:0},
+{bab:"BAB 7",warna:"#D6EAF8",q:"Malaikat penjaga surga adalah ....",opsi:["Ridwan","Malik","Raqib"],jawab:0},
+{bab:"BAB 7",warna:"#D6EAF8",q:"Malaikat Munkar dan Nakir bertugas ....",opsi:["Mencabut nyawa","Menurunkan rezeki","Menanyai manusia di kubur"],jawab:2},
+{bab:"BAB 7",warna:"#D6EAF8",q:"Contoh meneladani malaikat di sekolah adalah ....",opsi:["Mengobrol saat belajar","Taat kepada guru","Datang terlambat"],jawab:1},
+
+{bab:"BAB 8",warna:"#FCF3CF",q:"Berkata sesuai kenyataan disebut ....",opsi:["Jujur","Sombong","Curang"],jawab:0},
+{bab:"BAB 8",warna:"#FCF3CF",q:"Jika menemukan barang teman, sikap yang benar adalah ....",opsi:["Menyimpan","Mengembalikan","Membuang"],jawab:1},
+{bab:"BAB 8",warna:"#FCF3CF",q:"Kebersihan merupakan sebagian dari ....",opsi:["Iman","Kekayaan","Ilmu"],jawab:0},
+{bab:"BAB 8",warna:"#FCF3CF",q:"Adab makan yang benar adalah menggunakan ....",opsi:["Tangan kiri","Tangan kanan","Kedua tangan"],jawab:1},
+{bab:"BAB 8",warna:"#FCF3CF",q:"Sebelum makan kita membaca ....",opsi:["Doa","Pantun","Lagu"],jawab:0},
+
+{bab:"BAB 9",warna:"#FED7C3",q:"Arti zikir adalah ....",opsi:["Meminta sesuatu","Mengingat Allah","Bermain"],jawab:1},
+{bab:"BAB 9",warna:"#FED7C3",q:"Ucapan Alhamdulillah disebut bacaan ....",opsi:["Tahmid","Takbir","Tasbih"],jawab:0},
+{bab:"BAB 9",warna:"#FED7C3",q:"Saat kagum melihat ciptaan Allah kita mengucapkan ....",opsi:["Subhanallah","Astaghfirullah","Allahu Akbar"],jawab:0},
+{bab:"BAB 9",warna:"#FED7C3",q:"Bacaan istighfar adalah ....",opsi:["Subhanallah","Astaghfirullah","Alhamdulillah"],jawab:1},
+{bab:"BAB 9",warna:"#FED7C3",q:"Berdoa setelah salat dilakukan dengan ....",opsi:["Tenang dan khusyuk","Bercanda","Berteriak"],jawab:0},
+
+{bab:"BAB 10",warna:"#EBDEF0",q:"Nabi Yakub a.s. terkenal sangat .... kepada anak-anaknya.",opsi:["Pemarah","Penyayang","Keras"],jawab:1},
+{bab:"BAB 10",warna:"#EBDEF0",q:"Ayah Nabi Yakub a.s. adalah Nabi ....",opsi:["Ishaq a.s.","Ismail a.s.","Ibrahim a.s."],jawab:0},
+{bab:"BAB 10",warna:"#EBDEF0",q:"Sikap yang dapat diteladani dari Nabi Yakub a.s. adalah ....",opsi:["Saling menyayangi keluarga","Suka bertengkar","Malas belajar"],jawab:0}
+
+];
+
+quizData.sort(()=>Math.random()-0.5);
+
+let nomor=0;
+let skor=0;
+
+function tampilSoal(){
+
+const s=quizData[nomor];
+
+document.getElementById("nomor").innerText=
+`Soal ${nomor+1} dari ${quizData.length}`;
+
+document.getElementById("bab").innerText=s.bab;
+document.getElementById("bab").style.background=s.warna;
+
+document.getElementById("soal").innerText=s.q;
+
+document.getElementById("fill").style.width=
+((nomor)/quizData.length*100)+"%";
+
+let html="";
+
+s.opsi.forEach((opsi,index)=>{
+html+=`
+<button class="option"
+onclick="jawab(${index})">
+${String.fromCharCode(65+index)}. ${opsi}
+</button>`;
+});
+
+document.getElementById("pilihan").innerHTML=html;
+
+}
+
+function jawab(index){
+
+if(index===quizData[nomor].jawab){
+skor++;
+alert("✅ Jawaban Benar");
+}else{
+alert("❌ Jawaban Salah");
+}
+
+nomor++;
+
+if(nomor<quizData.length){
+tampilSoal();
+}else{
+selesai();
+}
+
+}
+
+function selesai(){
+
+document.getElementById("quiz").style.display="none";
+document.getElementById("hasil").style.display="block";
+
+const nilai=Math.round(
+(skor/quizData.length)*100
+);
+
+document.getElementById("nilai").innerText=nilai;
+
+let pesan="";
+
+if(nilai>=80){
+pesan="🏆 Subhanallah! Nilaimu sangat baik!";
+}else if(nilai>=60){
+pesan="📚 Bagus! Terus belajar ya!";
+}else{
+pesan="🌟 Tetap semangat belajar!";
+}
+
+document.getElementById("pesan").innerText=pesan;
+
+}
+
+function ulangKuis(){
+location.reload();
+}
+
+tampilSoal();
+
+</script>
+
+</body>
+</html>
